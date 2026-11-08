@@ -188,6 +188,14 @@ img.logo-mark { display: block; object-fit: cover; border-radius: 50%; border: 2
 .hero > .wrap { position: relative; z-index: 1; }
 @keyframes drift { from { transform: scale(1.02) translate3d(0, 0, 0); } to { transform: scale(1.09) translate3d(-2%, 1.5%, 0); } }
 
+/* Typewriter headings */
+.typewrite { position: relative; }
+.tw-ghost { visibility: hidden; }
+.tw-live { position: absolute; inset: 0; text-align: center; }
+.tw-caret { display: inline-block; width: 2px; height: 0.85em; margin-inline-start: 3px; vertical-align: -0.08em; background: var(--accent-text); animation: blink 0.8s steps(1) infinite; }
+.tw-caret.off { opacity: 0; animation: none; }
+@keyframes blink { 50% { opacity: 0; } }
+
 /* About */
 .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
 .about-text { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; min-width: 0; }
@@ -361,7 +369,7 @@ img.logo-mark { display: block; object-fit: cover; border-radius: 50%; border: 2
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">مهارات اللغة</span>
-      <h2>ما أُدرّسه في كل حصة</h2>
+      <h2 class="typewrite">ما أُدرّسه في كل حصة</h2>
     </div>
     <div class="skills">
       <div class="skill"><span class="glyph" aria-hidden="true">é</span><div><h3>Grammaire</h3><p>القواعد</p></div></div>
@@ -378,7 +386,7 @@ img.logo-mark { display: block; object-fit: cover; border-radius: 50%; border: 2
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">البرامج</span>
-      <h2>اختر البرنامج المناسب لك</h2>
+      <h2 class="typewrite">اختر البرنامج المناسب لك</h2>
     </div>
     <div class="progs">
       <article class="prog">
@@ -414,7 +422,7 @@ img.logo-mark { display: block; object-fit: cover; border-radius: 50%; border: 2
   <div class="wrap">
     <div class="sec-head">
       <span class="eyebrow">طرق الدفع</span>
-      <h2>حوّل رسوم الحصص بسهولة</h2>
+      <h2 class="typewrite">حوّل رسوم الحصص بسهولة</h2>
       <p>اختر وسيلة الدفع المناسبة، ثم أرسل صورة التحويل على إحدى صفحاتي ليتم تأكيد حجزك.</p>
     </div>
     <div class="pay-grid">
@@ -509,6 +517,44 @@ document.querySelectorAll(".copy").forEach(function (btn) {
     } catch (e) { select(); }
   });
 });
+
+// كتابة العناوين حرفًا حرفًا عند ظهورها
+function twType(s) {
+  var i = 0;
+  s.caret.classList.remove("off");
+  (function step() {
+    i++;
+    s.txt.nodeValue = s.parts.slice(0, i).join("");
+    if (i < s.parts.length) setTimeout(step, 55);
+    else setTimeout(function () { s.caret.classList.add("off"); }, 1400);
+  })();
+}
+try {
+  var els = document.querySelectorAll(".typewrite");
+  var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!calm && "IntersectionObserver" in window) {
+    els.forEach(function (h) {
+      var text = h.textContent.trim();
+      h.setAttribute("aria-label", text);
+      h.innerHTML = "";
+      var ghost = document.createElement("span"); ghost.className = "tw-ghost"; ghost.setAttribute("aria-hidden", "true"); ghost.textContent = text;
+      var live = document.createElement("span"); live.className = "tw-live"; live.setAttribute("aria-hidden", "true");
+      var txt = document.createTextNode("");
+      var caret = document.createElement("span"); caret.className = "tw-caret off";
+      live.appendChild(txt); live.appendChild(caret);
+      h.appendChild(ghost); h.appendChild(live);
+      h._tw = { parts: text.match(/\P{M}\p{M}*/gu) || [text], txt: txt, caret: caret };
+    });
+    var tio = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        tio.unobserve(e.target);
+        twType(e.target._tw);
+      });
+    }, { threshold: 0.8 });
+    els.forEach(function (h) { if (h._tw) tio.observe(h); });
+  }
+} catch (e) {}
 
 // خلفية الصورة الباهتة في أعلى الصفحة
 try {
