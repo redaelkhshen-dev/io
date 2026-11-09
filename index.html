@@ -531,8 +531,7 @@ function twType(s) {
 }
 try {
   var els = document.querySelectorAll(".typewrite");
-  var calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!calm && "IntersectionObserver" in window) {
+  if ("IntersectionObserver" in window) {
     els.forEach(function (h) {
       var text = h.textContent.trim();
       h.setAttribute("aria-label", text);
@@ -551,7 +550,7 @@ try {
         tio.unobserve(e.target);
         twType(e.target._tw);
       });
-    }, { threshold: 0.8 });
+    }, { threshold: 0.6 });
     els.forEach(function (h) { if (h._tw) tio.observe(h); });
   }
 } catch (e) {}
