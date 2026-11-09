@@ -189,11 +189,10 @@ img.logo-mark { display: block; object-fit: cover; border-radius: 50%; border: 2
 @keyframes drift { from { transform: scale(1.02) translate3d(0, 0, 0); } to { transform: scale(1.09) translate3d(-2%, 1.5%, 0); } }
 
 /* Typewriter headings */
-.typewrite { position: relative; }
-.tw-ghost { visibility: hidden; }
-.tw-live { position: absolute; inset: 0; text-align: center; }
-.tw-caret { display: inline-block; width: 2px; height: 0.85em; margin-inline-start: 3px; vertical-align: -0.08em; background: var(--accent-text); animation: blink 0.8s steps(1) infinite; }
-.tw-caret.off { opacity: 0; animation: none; }
+.tw-rest { visibility: hidden; }
+.tw-caret { display: inline-block; position: relative; width: 0; height: 0.85em; vertical-align: -0.08em; }
+.tw-caret::after { content: ""; position: absolute; top: 0; inset-inline-start: 1px; width: 2px; height: 100%; background: var(--accent-text); animation: blink 0.8s steps(1) infinite; }
+.tw-caret.off::after { opacity: 0; animation: none; }
 @keyframes blink { 50% { opacity: 0; } }
 
 /* About */
@@ -449,7 +448,7 @@ img.logo-mark { display: block; object-fit: cover; border-radius: 50%; border: 2
   <div class="wrap contact">
     <div class="contact-text">
       <span class="eyebrow">تواصل معي</span>
-      <h2>Une question ؟ راسلني.</h2>
+      <h2 class="typewrite">Une question ؟ راسلني.</h2>
       <p>للحجز أو الاستفسار عن المواعيد والمستويات، راسلني على أي من المنصات وسأرد عليك في أقرب وقت.</p>
     </div>
     <div class="socials">
@@ -525,7 +524,8 @@ function twType(s) {
   s.caret.classList.remove("off");
   (function step() {
     i++;
-    s.txt.nodeValue = s.parts.slice(0, i).join("");
+    s.typed.nodeValue = s.parts.slice(0, i).join("");
+    s.rest.textContent = s.parts.slice(i).join("");
     if (i < s.parts.length) setTimeout(step, 55);
     else setTimeout(function () { s.caret.classList.add("off"); }, 1400);
   })();
@@ -537,13 +537,11 @@ try {
       var text = h.textContent.trim();
       h.setAttribute("aria-label", text);
       h.innerHTML = "";
-      var ghost = document.createElement("span"); ghost.className = "tw-ghost"; ghost.setAttribute("aria-hidden", "true"); ghost.textContent = text;
-      var live = document.createElement("span"); live.className = "tw-live"; live.setAttribute("aria-hidden", "true");
-      var txt = document.createTextNode("");
-      var caret = document.createElement("span"); caret.className = "tw-caret off";
-      live.appendChild(txt); live.appendChild(caret);
-      h.appendChild(ghost); h.appendChild(live);
-      h._tw = { parts: text.match(/\P{M}\p{M}*/gu) || [text], txt: txt, caret: caret };
+      var typed = document.createTextNode("");
+      var caret = document.createElement("span"); caret.className = "tw-caret off"; caret.setAttribute("aria-hidden", "true");
+      var rest = document.createElement("span"); rest.className = "tw-rest"; rest.setAttribute("aria-hidden", "true"); rest.textContent = text;
+      h.appendChild(typed); h.appendChild(caret); h.appendChild(rest);
+      h._tw = { parts: text.match(/\P{M}\p{M}*/gu) || [text], typed: typed, caret: caret, rest: rest };
     });
     var tio = new IntersectionObserver(function (es) {
       es.forEach(function (e) {
